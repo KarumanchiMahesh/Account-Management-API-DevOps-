@@ -1,0 +1,46 @@
+stages:
+  - build
+  - test
+  # - deploy
+
+build:
+  image: nikolaik/python-nodejs:python3.8-nodejs13
+  stage: build
+  script:
+    - echo "Building"
+    - pip install -r requirements.txt
+    - npm install
+    - mkdir build
+    - touch build/info.txt
+  artifacts:
+    paths:
+      - build/
+
+Unit-test:
+  image: python:3.8.2
+  stage: test
+  script:
+    - echo "This job tests the Unit tests."
+    - echo "build stage is complete."
+    - pip install -r requirements.txt
+    - python test_basic.py
+    - test -f "build/info.txt"
+
+API-test:
+  image: nikolaik/python-nodejs:python3.8-nodejs13
+  stage: test
+  script:
+    - echo "This job tests the API-testing."
+    - echo "build stage is complete."
+    - npm install
+    - pip install -r requirements.txt
+    - npm install -g newman
+    - python main.py & newman run api-tests.json
+    - test -f "build/info.txt"
+
+    
+# deploy:
+#   stage: deploy
+#   script:
+#     - echo "This job deploys the project"
+#     - echo "test stage complete."
